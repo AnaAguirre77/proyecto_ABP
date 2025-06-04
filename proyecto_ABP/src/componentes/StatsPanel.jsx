@@ -4,13 +4,13 @@ function StatsPanel(props) {
       <h2 className="text-2xl font-semibold text-[#5B9BD5] mb-4">
         Estadísticas 📊
       </h2>
-      <p className="mb-1 ">
+      <p className="mb-1 text-[#5B9BD5]">
         El producto más caro: {props.maxTitulo}, ${props.max}
       </p>
-      <p className="mb-1">
+      <p className="mb-1 text-[#5B9BD5]">
         El producto más barato: {props.minTitulo}, ${props.min}
       </p>
-      <p className="mb-1">
+      <p className="mb-1 text-[#5B9BD5]">
         El precio total de todos los productos: ${props.precioTotal}
       </p>
     </div>

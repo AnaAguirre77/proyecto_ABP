@@ -2,9 +2,8 @@
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
-  color-scheme: light dark;
   background-color: #d0f0fd;
+  color-scheme: light dark;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -25,7 +24,6 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #d0f0fd;
 }
 
 h1 {
@@ -55,7 +53,6 @@ button:focus-visible {
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
-    background-color: #d0f0fd;
   }
   a:hover {
     color: #747bff;
@@ -63,4 +60,19 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+.app {
+  background-color: white;
+  color: black;
+  transition: all 0.3s ease;
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  margin: 2rem auto;
+}
+
+.dark-mode {
+  background-color: #121212;
+  color: azure;
 }

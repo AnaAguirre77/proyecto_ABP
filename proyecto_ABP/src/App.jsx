@@ -1,13 +1,18 @@
 import "./App.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import ProductList from "./componentes/ProductList";
 import StatsPanel from "./componentes/StatsPanel";
+import SearchBar from "./componentes/SearchBar";
 
 function App() {
   const [products, setProducts] = useState([]);
   const [search, setSearch] = useState("");
   const [show, setShow] = useState(true);
+  const [darkMode, setDarkMode] = useState(false);
+
+  // referencias
+  const containerRef = useRef(null);
 
   // conexion con la API
   useEffect(() => {
@@ -28,42 +33,54 @@ function App() {
 
   const precioTotal = filteredProducts.reduce((acc, p) => acc + p.price, 0);
 
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+    containerRef.current.classList.toggle("dark-mode");
+  };
+
   return (
-    <div className="bg-[#D0F0FD] min-h-screen py-8 px-4">
-      <h1 className="text-2xl text-center mb-6 text-[#4A90E2] font-semibold">
-        tienda online de productos 🛍️
-      </h1>
-      <input
-        type="text"
-        placeholder="Buscar un producto..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="block mx-auto p-2 mb-6 rounded border-[#B5DFF7] shadow-sm focus:outline-none focus:ring focus:border-[#A0D8EF]"
-      />
-      <ProductList products={filteredProducts} />
-
-      {/* renderizacion condicional */}
-      {filteredProducts.length === 0 && (
-        <div className="text-center mt-4 text-red-600">
-          No se encontraron productos!
-        </div>
-      )}
-
+    <div
+      ref={containerRef}
+      className={`app ${
+        darkMode ? "dark-mode" : ""
+      } max-w-6xl mx-auto mt-6 p-4 sm:p-8 rounded-2xl shadow-lg transition-all`}
+    >
       <button
-        onClick={() => setShow(!show)}
-        className="mt-4 px-4 py-2 text-[#4A90E2] border rounded hover:bg-[#EAF8FE] transition"
+        onClick={toggleDarkMode}
+        className="mt-4 px-4 py-2 w-full sm:w-auto text-[#4A90E2] border rounded hover:bg-[#EAF8FE] transition"
       >
-        {show ? "Ocultar estadísticas" : "Mostrar estadísticas"}
+        MODO {darkMode ? "Claro 🤍" : "Oscuro 🖤"}
       </button>
-      {show && (
-        <StatsPanel
-          max={max}
-          min={min}
-          maxTitulo={maxTitulo}
-          minTitulo={minTitulo}
-          precioTotal={precioTotal}
-        />
-      )}
+      <div className="min-h-screen py-8 px-4">
+        <h1 className="text-xl sm:text-2xl text-center mb-6 text-[#4A90E2] font-semibold">
+          tienda online de productos 🛍️
+        </h1>
+        <SearchBar search={search} setSearch={setSearch} />
+        <ProductList products={filteredProducts} />
+
+        {/* renderizacion condicional */}
+        {filteredProducts.length === 0 && (
+          <div className="text-center mt-4 text-red-600">
+            No se encontraron productos!
+          </div>
+        )}
+
+        <button
+          onClick={() => setShow(!show)}
+          className="mt-4 px-4 py-2 w-full sm:w-auto text-[#4A90E2] border rounded hover:bg-[#EAF8FE] transition"
+        >
+          {show ? "Ocultar estadísticas" : "Mostrar estadísticas"}
+        </button>
+        {show && (
+          <StatsPanel
+            max={max}
+            min={min}
+            maxTitulo={maxTitulo}
+            minTitulo={minTitulo}
+            precioTotal={precioTotal}
+          />
+        )}
+      </div>
     </div>
   );
 }
