@@ -10,20 +10,47 @@ function App() {
   const [search, setSearch] = useState("");
   const [show, setShow] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [sortBy, setSortBy] = useState("");
 
   // referencias
   const containerRef = useRef(null);
 
-  // conexion con la API
+  // conexion con la API, para obtener productos
   useEffect(() => {
     axios.get("https://dummyjson.com/products?limit=100").then((res) => {
       setProducts(res.data.products);
     });
   }, []);
 
-  const filteredProducts = products.filter((p) =>
-    p.title.toLowerCase().includes(search.toLowerCase())
-  );
+  // trabajando con categorias
+
+  useEffect(() => {
+    axios.get("https://dummyjson.com/products/categories").then((res) => {
+      setCategories(res.data);
+    });
+  }, []);
+
+  const filteredProducts = products.filter((p) => {
+    return (
+      p.title.toLowerCase().includes(search.toLowerCase()) &&
+      (selectedCategory === "" || p.category === selectedCategory)
+    );
+  });
+
+  // para el ordenamiento asc y desc
+
+  let sortedProducts = [...filteredProducts];
+  if (sortBy === "price-asc") {
+    sortedProducts.sort((a, b) => a.price - b.price);
+  } else if (sortBy === "price-desc") {
+    sortedProducts.sort((a, b) => b.price - a.price);
+  } else if (sortBy === "rating-asc") {
+    sortedProducts.sort((a, b) => a.rating - b.rating);
+  } else if (sortBy === "rating-desc") {
+    sortedProducts.sort((a, b) => b.rating - a.rating);
+  }
 
   const max = Math.max(...filteredProducts.map((p) => p.price));
   const min = Math.min(...filteredProducts.map((p) => p.price));
@@ -32,6 +59,8 @@ function App() {
   const minTitulo = filteredProducts.find((p) => p.price === min)?.title || "";
 
   const precioTotal = filteredProducts.reduce((acc, p) => acc + p.price, 0);
+
+  // trabajando con dark mode
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -56,7 +85,35 @@ function App() {
           tienda online de productos 🛍️
         </h1>
         <SearchBar search={search} setSearch={setSearch} />
-        <ProductList products={filteredProducts} />
+
+        <div className="flex flex-wrap justify-center items-center gap-4 my-4">
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="p-2 rounded text-[#5B9BD5] border-[#B5DFF7] shadow-sm w-52"
+          >
+            <option value="">todas las categorías</option>
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="p-2 rounded text-[#5B9BD5] border-[#B5DFF7] shadow-sm w-52"
+          >
+            <option value="">ordenar por</option>
+            <option value="price-asc">precio: menor a mayor</option>
+            <option value="price-desc">precio: mayor a menor</option>
+            <option value="rating-asc">rating: menor a mayor</option>
+            <option value="rating-desc">rating: mayor a menor</option>
+          </select>
+        </div>
+
+        <ProductList products={sortedProducts} />
 
         {/* renderizacion condicional */}
         {filteredProducts.length === 0 && (
