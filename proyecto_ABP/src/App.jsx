@@ -28,6 +28,7 @@ function App() {
 
   useEffect(() => {
     axios.get("https://dummyjson.com/products/categories").then((res) => {
+      console.log(res.data);
       setCategories(res.data);
     });
   }, []);
@@ -60,6 +61,60 @@ function App() {
 
   const precioTotal = filteredProducts.reduce((acc, p) => acc + p.price, 0);
 
+  // para sumar nuevas estadisticas
+
+  const precioPromedio =
+    filteredProducts.length > 0
+      ? (precioTotal / filteredProducts.length).toFixed(2)
+      : 0;
+
+  const StockMayor50 = filteredProducts.filter((p) => p.stock > 50).length;
+  const RatingMayor4_5 = filteredProducts.filter((p) => p.rating > 4.5).length;
+
+  const productosPorCategoria = filteredProducts.reduce((acc, producto) => {
+    acc[producto.category] = (acc[producto.category] || 0) + 1;
+    return acc;
+  }, {});
+
+  const promedioPorCategoria = filteredProducts.reduce((acc, producto) => {
+    if (!acc[producto.category]) {
+      acc[producto.category] = { suma: 0, cantidad: 0 };
+    }
+    acc[producto.category].suma += producto.price;
+    acc[producto.category].cantidad += 1;
+    return acc;
+  }, {});
+
+  const precioPromedioPorCategoria = {};
+  for (const categoria in promedioPorCategoria) {
+    const { suma, cantidad } = promedioPorCategoria[categoria];
+    precioPromedioPorCategoria[categoria] = (suma / cantidad).toFixed(2);
+  }
+
+  const promedioRatingGeneral =
+    filteredProducts.length > 0
+      ? (
+          filteredProducts.reduce((acc, p) => acc + p.rating, 0) /
+          filteredProducts.length
+        ).toFixed(2)
+      : 0;
+
+  const ratingPorCategoria = {};
+  filteredProducts.forEach((producto) => {
+    const cat = producto.category;
+    if (!ratingPorCategoria[cat]) {
+      ratingPorCategoria[cat] = { suma: 0, cantidad: 0 };
+    }
+    ratingPorCategoria[cat].suma += producto.rating;
+    ratingPorCategoria[cat].cantidad += 1;
+  });
+
+  const promedioRatingPorCategoria = {};
+  for (const categoria in ratingPorCategoria) {
+    const { suma, cantidad } = ratingPorCategoria[categoria];
+    promedioRatingPorCategoria[categoria] = (suma / cantidad).toFixed(2);
+  }
+
   // trabajando con dark mode
 
   const toggleDarkMode = () => {
@@ -76,14 +131,22 @@ function App() {
     >
       <button
         onClick={toggleDarkMode}
-        className="mt-4 px-4 py-2 w-full sm:w-auto text-[#4A90E2] border rounded hover:bg-[#EAF8FE] transition"
+        className="mt-4 px-4 py-2 w-full sm:w-auto text-black border rounded hover:bg-[#EAF8FE] transition"
       >
-        MODO {darkMode ? "Claro 🤍" : "Oscuro 🖤"}
+        modo {darkMode ? "claro 🤍" : "oscuro 🖤"}
       </button>
       <div className="min-h-screen py-8 px-4">
-        <h1 className="text-xl sm:text-2xl text-center mb-6 text-[#4A90E2] font-semibold">
-          tienda online de productos 🛍️
-        </h1>
+        <div className="relative mb-6 rounded-lg overflow-hidden h-40 sm:h-56">
+          <img
+            src="https://www.pixelbyhand.com/wp-content/uploads/2023/11/A-collage-of-various-e-commerce-products-represented-in-different-photography-styles_-lifestyle-minimalism-interactive-environmental-and-monochrom.png"
+            alt="productos"
+            className="absolute inset-0 w-full h-full object-cover opacity-30"
+          />
+          <h1 className="relative text-xl sm:text-2xl text-center h-full flex items-center justify-center font-semibold z-10 px-4">
+            - tienda online de productos -
+          </h1>
+        </div>
+
         <SearchBar search={search} setSearch={setSearch} />
 
         <div className="flex flex-wrap justify-center items-center gap-4 my-4">
@@ -94,8 +157,8 @@ function App() {
           >
             <option value="">todas las categorías</option>
             {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
+              <option key={cat.slug} value={cat.slug}>
+                {cat.name}
               </option>
             ))}
           </select>
@@ -135,6 +198,13 @@ function App() {
             maxTitulo={maxTitulo}
             minTitulo={minTitulo}
             precioTotal={precioTotal}
+            precioPromedio={precioPromedio}
+            stockMayor50={StockMayor50}
+            ratingMayor45={RatingMayor4_5}
+            productosPorCategoria={productosPorCategoria}
+            precioPromedioPorCategoria={precioPromedioPorCategoria}
+            promedioRatingGeneral={promedioRatingGeneral}
+            promedioRatingPorCategoria={promedioRatingPorCategoria}
           />
         )}
       </div>
