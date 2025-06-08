@@ -4,6 +4,9 @@ import axios from "axios";
 import ProductList from "./componentes/ProductList";
 import StatsPanel from "./componentes/StatsPanel";
 import SearchBar from "./componentes/SearchBar";
+import BarChartCategory from "./componentes/graficos/BarChartCategory";
+import LineChartPriceEvolution from "./componentes/graficos/LineChartPriceEvolution";
+import PieChartStock from "./componentes/graficos/PieChartStock";
 
 function App() {
   const [products, setProducts] = useState([]);
@@ -146,9 +149,7 @@ function App() {
             - tienda online de productos -
           </h1>
         </div>
-
         <SearchBar search={search} setSearch={setSearch} />
-
         <div className="flex flex-wrap justify-center items-center gap-4 my-4">
           <select
             value={selectedCategory}
@@ -175,16 +176,13 @@ function App() {
             <option value="rating-desc">rating: mayor a menor</option>
           </select>
         </div>
-
         <ProductList products={sortedProducts} />
-
         {/* renderizacion condicional */}
         {filteredProducts.length === 0 && (
           <div className="text-center mt-4 text-red-600">
             No se encontraron productos!
           </div>
         )}
-
         <button
           onClick={() => setShow(!show)}
           className="mt-4 px-4 py-2 w-full sm:w-auto text-[#4A90E2] border rounded hover:bg-[#EAF8FE] transition"
@@ -192,20 +190,31 @@ function App() {
           {show ? "Ocultar estadísticas" : "Mostrar estadísticas"}
         </button>
         {show && (
-          <StatsPanel
-            max={max}
-            min={min}
-            maxTitulo={maxTitulo}
-            minTitulo={minTitulo}
-            precioTotal={precioTotal}
-            precioPromedio={precioPromedio}
-            stockMayor50={StockMayor50}
-            ratingMayor45={RatingMayor4_5}
-            productosPorCategoria={productosPorCategoria}
-            precioPromedioPorCategoria={precioPromedioPorCategoria}
-            promedioRatingGeneral={promedioRatingGeneral}
-            promedioRatingPorCategoria={promedioRatingPorCategoria}
-          />
+          <>
+            <StatsPanel
+              max={max}
+              min={min}
+              maxTitulo={maxTitulo}
+              minTitulo={minTitulo}
+              precioTotal={precioTotal}
+              precioPromedio={precioPromedio}
+              stockMayor50={StockMayor50}
+              ratingMayor45={RatingMayor4_5}
+              productosPorCategoria={productosPorCategoria}
+              precioPromedioPorCategoria={precioPromedioPorCategoria}
+              promedioRatingGeneral={promedioRatingGeneral}
+              promedioRatingPorCategoria={promedioRatingPorCategoria}
+            />
+            <div className="mt-8 max-w-4xl mx-auto">
+              <BarChartCategory data={filteredProducts} />
+            </div>
+            <div className="mt-8 max-w-4xl mx-auto">
+              <LineChartPriceEvolution data={filteredProducts} />
+            </div>
+            <div className="mt-8 max-w-md mx-auto">
+              <PieChartStock products={filteredProducts} />
+            </div>
+          </>
         )}
       </div>
     </div>
