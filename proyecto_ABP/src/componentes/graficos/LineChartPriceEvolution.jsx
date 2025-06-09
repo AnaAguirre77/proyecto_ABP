@@ -23,7 +23,7 @@ ChartJS.register(
 );
 
 function LineChartPriceEvolution() {
-  // datos simulados, en este caso, 7 dias
+  // datos simulados, en este caso: 7 dias
   const labels = [
     "Día 1",
     "Día 2",
@@ -59,7 +59,7 @@ function LineChartPriceEvolution() {
       title: {
         display: true,
         text: "Evolución de precios",
-        color: "#000000",
+        color: "grey",
         font: { weight: "bold", size: 16 },
       },
       tooltip: {

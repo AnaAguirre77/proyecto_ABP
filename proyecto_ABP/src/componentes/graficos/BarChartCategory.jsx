@@ -54,7 +54,7 @@ export default function BarChartCategory({ data }) {
       title: {
         display: true,
         text: "Cantidad de productos por categoría",
-        color: "#000000",
+        color: "grey",
         font: { weight: "bold", size: 16 },
       },
     },

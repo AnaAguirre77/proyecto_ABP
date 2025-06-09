@@ -1,13 +1,50 @@
-# Proyecto ABP: Tienda Online
+# Proyecto ABP: Tienda Online de Productos.
 
-Aplicacion desarrollada con **React**, usando **Axios** para conectarse a una API externa de productos (https://dummyjson.com/products).
+Aplicación desarrollada con **React**, utilizando **Axios** para consumir una API externa de productos ([DummyJSON](https://dummyjson.com/products)).
 
-Permite buscar productos, filtrar por categoria, ordenar por precio / rating, y ademas ver estadisticas simples (como el producto mas caro, mas barato y el total de precios).
+Permite buscar productos, filtrarlos por categoría, ordenarlos por precio o rating, y visualizar estadísticas basicas a través de un panel informativo y gráficos interactivos. El desarrollo se basa en prácticas modernas de programación, priorizando la accesibilidad, la estética y la experiencia del usuario.
 
-**Alumna:** Aguirre, Ana Luz.
+# Funcionalidades principales
 
-**Materia:** Proyecto Integrador.
+- Búsqueda por nombre de producto
+- Filtro por categoría
+- Ordenamiento por precio (ascendente,descendente) y rating
+- Panel de estadísticas dinamicas
+- Visualización de graficos (barra, línea y torta)
+- Exportación de productos filtrados en formato JSON, CSV o Excel
+- Modo oscuro (DarkMode)
+- Paginación (para mejorar el rendimiento de carga)
+- Diseño 'responsive'
 
-**Profesor:** Garcia, Hector.
+# Tecnologías utilizadas
 
-**ISPC**
+- React
+- Vite
+- Axios
+- TailwindCSS
+- Chart.js
+- JavaScript moderno(ES6+)
+
+# Instalación y ejecución
+
+1. Clonar el repositorio:  
+   `git clone`
+
+2. Instalar las dependencias:  
+   `npm install`
+
+3. Ejecutar el servidor de desarrollo:  
+   `npm run dev`
+
+4. Abrir en el navegador:  
+   (http://localhost:5173)
+
+**Alumna:** Aguirre, Ana Luz
+
+**Materia:** Proyecto Integrador
+
+**Profesor:** García, Héctor
+
+**Institución:** ISPC
+
+Muchas gracias!!

@@ -16,16 +16,25 @@ function App() {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [sortBy, setSortBy] = useState("");
+  const [format, setFormat] = useState("");
+  const [page, setPage] = useState(1);
 
   // referencias
   const containerRef = useRef(null);
+  const limit = 30;
 
   // conexion con la API, para obtener productos
   useEffect(() => {
-    axios.get("https://dummyjson.com/products?limit=100").then((res) => {
-      setProducts(res.data.products);
-    });
-  }, []);
+    axios
+      .get(
+        `https://dummyjson.com/products?limit=${limit}&skip=${
+          (page - 1) * limit
+        }`
+      )
+      .then((res) => {
+        setProducts(res.data.products);
+      });
+  }, [page]);
 
   // trabajando con categorias
 
@@ -43,7 +52,7 @@ function App() {
     );
   });
 
-  // para el ordenamiento asc y desc
+  // para el ordenamiento, asc y desc
 
   let sortedProducts = [...filteredProducts];
   if (sortBy === "price-asc") {
@@ -125,6 +134,43 @@ function App() {
     containerRef.current.classList.toggle("dark-mode");
   };
 
+  const handleExport = () => {
+    let blob, url, filename;
+
+    if (format === "json") {
+      blob = new Blob([JSON.stringify(filteredProducts, null, 2)], {
+        type: "application/json",
+      });
+      filename = "productos.json";
+    } else if (format === "csv" || format === "excel") {
+      const headers = Object.keys(filteredProducts[0] || {}).join(",");
+      const rows = filteredProducts.map((p) =>
+        Object.values(p)
+          .map((value) => `"${String(value).replace(/"/g, '""')}"`)
+          .join(",")
+      );
+      const csv = [headers, ...rows].join("\n");
+      blob = new Blob([csv], { type: "text/csv" });
+      filename = format === "csv" ? "productos.csv" : "productos.xls";
+    } else {
+      alert("Por favor selecciona un formato válido.");
+      return;
+    }
+
+    url = URL.createObjectURL(blob);
+    triggerDownload(url, filename);
+  };
+
+  const triggerDownload = (url, filename) => {
+    //para crear un hipervinculo
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div
       ref={containerRef}
@@ -136,7 +182,7 @@ function App() {
         onClick={toggleDarkMode}
         className="mt-4 px-4 py-2 w-full sm:w-auto text-black border rounded hover:bg-[#EAF8FE] transition"
       >
-        modo {darkMode ? "claro 🤍" : "oscuro 🖤"}
+        modo {darkMode ? "claro 𖤓" : "oscuro ☾"}
       </button>
       <div className="min-h-screen py-8 px-4">
         <div className="relative mb-6 rounded-lg overflow-hidden h-40 sm:h-56">
@@ -146,7 +192,7 @@ function App() {
             className="absolute inset-0 w-full h-full object-cover opacity-30"
           />
           <h1 className="relative text-xl sm:text-2xl text-center h-full flex items-center justify-center font-semibold z-10 px-4">
-            - tienda online de productos -
+            ⊹ ࣪ ˖ tienda online de productos . ݁⊹
           </h1>
         </div>
         <SearchBar search={search} setSearch={setSearch} />
@@ -176,6 +222,26 @@ function App() {
             <option value="rating-desc">rating: mayor a menor</option>
           </select>
         </div>
+        <div className="flex flex-wrap justify-center items-center gap-4 my-4">
+          <select
+            value={format}
+            onChange={(e) => setFormat(e.target.value)}
+            className="p-2 rounded text-[#5B9BD5] border-[#B5DFF7] shadow-sm w-52"
+          >
+            <option value="">Descargar</option>
+            <option value="json">Formato JSON</option>
+            <option value="csv">Formato CSV</option>
+            <option value="excel">Formato Excel</option>{" "}
+            {/* (CSV, con extension .xls) */}
+          </select>
+          <button
+            onClick={handleExport}
+            className="px-4 py-2 rounded border text-[#5B9BD5] hover:bg-[#EAF8FE] transition"
+          >
+            exportar archivo
+          </button>
+        </div>
+
         <ProductList products={sortedProducts} />
         {/* renderizacion condicional */}
         {filteredProducts.length === 0 && (
@@ -185,7 +251,7 @@ function App() {
         )}
         <button
           onClick={() => setShow(!show)}
-          className="mt-4 px-4 py-2 w-full sm:w-auto text-[#4A90E2] border rounded hover:bg-[#EAF8FE] transition"
+          className="mt-4 px-4 py-2 w-full sm:w-auto text-[#5B9BD5] border rounded hover:bg-[#EAF8FE] transition"
         >
           {show ? "Ocultar estadísticas" : "Mostrar estadísticas"}
         </button>
@@ -205,17 +271,47 @@ function App() {
               promedioRatingGeneral={promedioRatingGeneral}
               promedioRatingPorCategoria={promedioRatingPorCategoria}
             />
-            <div className="mt-8 max-w-4xl mx-auto">
-              <BarChartCategory data={filteredProducts} />
-            </div>
-            <div className="mt-8 max-w-4xl mx-auto">
-              <LineChartPriceEvolution data={filteredProducts} />
-            </div>
-            <div className="mt-8 max-w-md mx-auto">
-              <PieChartStock products={filteredProducts} />
+            <div className="flex justify-center items-center gap-4 mt-8">
+              <div className="mt-8 max-w-4xl mx-auto">
+                <BarChartCategory data={filteredProducts} />
+              </div>
+              <div className="mt-8 max-w-4xl mx-auto">
+                <LineChartPriceEvolution data={filteredProducts} />
+              </div>
+              <div className="mt-8 max-w-md mx-auto">
+                <PieChartStock products={filteredProducts} />
+              </div>
             </div>
           </>
         )}
+      </div>
+      {/* paginacion */}
+      <div className="flex justify-center items-center gap-4 mt-8">
+        <button
+          disabled={page === 1}
+          onClick={() => setPage(page - 1)}
+          className={`px-4 py-2 rounded border transition ${
+            page === 1
+              ? "text-gray-400 border-gray-300 cursor-not-allowed"
+              : "text-[#28282B] border-[#B5DFF7] hover:bg-[#EAF8FE]"
+          }`}
+        >
+          página anterior
+        </button>
+
+        <span className="text-sm text-gray-600">página actual: {page}</span>
+
+        <button
+          disabled={filteredProducts.length < limit}
+          onClick={() => setPage(page + 1)}
+          className={`px-4 py-2 rounded border transition ${
+            filteredProducts.length < limit
+              ? "text-gray-400 border-gray-300 cursor-not-allowed"
+              : "text-[#28282B] border-[#B5DFF7] hover:bg-[#EAF8FE]"
+          }`}
+        >
+          página siguiente
+        </button>
       </div>
     </div>
   );
